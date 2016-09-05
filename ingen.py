@@ -1,5 +1,6 @@
 import argparse
 import time
+import os
 from pylatex import Document, Package, Command
 from pylatex.utils import NoEscape
 
@@ -25,8 +26,11 @@ myaddress = args.myaddress.split(';')
 clientaddress = args.clientaddress.split(';')
 
 
-#Need to auto incriment this
-invoiceNum = str(9999)
+clientdir = './' + args.clientname
+
+numbag = len(os.listdir(clientdir))
+nextfile = numbag + 1
+invoiceNum = str(nextfile)
 
 doc = Document(documentclass='letter', default_filepath='./' + args.clientname \
 	+ '/' + invoiceNum)
