@@ -19,41 +19,42 @@ parser.add_argument('--clientaddress',help='street;zip')
 parser.add_argument('--notes',help='Additional Notes')
 args = parser.parse_args()
 
-
 date = time.strftime("%m/%d/%y")
 
 myaddress = args.myaddress.split(';')
 clientaddress = args.clientaddress.split(';')
 
+
+#Need to auto incriment this
 invoiceNum = str(9999)
 
-
-doc = Document(documentclass='letter')
+doc = Document(documentclass='letter', default_filepath='./' + args.clientname \
+	+ '/' + invoiceNum)
 doc.packages.append(Package('invoice'))
 
-#This needs work to fix backticks 
-doc.preamble.append(Command('address', args.myname  + myaddress[0] \
-	+ myaddress[1] + args.myemail))
+EscapeMe = args.myname + '\\\\' + myaddress[0] + '\\\\' + myaddress[1] + '\\\\' + args.myemail
+doc.preamble.append(Command('address', NoEscape(EscapeMe)))
+
 doc.preamble.append(Command('date', date))
 
-doc.append(Command(command='begin', arguments='letter', \
-	extra_arguments=args.clientname + clientaddress[0] + \
-	clientaddress[1]))
-
+EscapeThem = args.clientname + '\\\\' + clientaddress[0] + '\\\\' + clientaddress[1]
+doc.append(Command('begin', NoEscape(EscapeThem)))
 
 doc.append(Command(command='opening', arguments='Invoice ' + invoiceNum))
-doc.append(Command(command='begin', arguments='invoice', extra_arguments=['USD','0']))
+doc.append(Command(command='begin', arguments=['invoice', 'USD', '0']))
 doc.append(Command(command='ProjectTitle', arguments=args.title))
 
-#Fee
+#Line Item Generation 
+for i in range(len(args.line)):
+	split1 = args.line[i]
+	newsplit = split1.split(';')
+	doc.append(Command(command='fee', arguments=[newsplit[0], newsplit[1], \
+		newsplit[2]]))
 
-
-
+#Closing Arguments (heh)
 doc.append(Command(command='end', arguments='invoice'))
 doc.append(Command(command='closing', arguments=args.notes))
 doc.append(Command(command='end', arguments='letter'))
+
 doc.generate_tex()
-
-
-
 
