@@ -42,7 +42,7 @@ doc.preamble.append(Command('address', NoEscape(EscapeMe)))
 doc.preamble.append(Command('date', date))
 
 EscapeThem = args.clientname + '\\\\' + clientaddress[0] + '\\\\' + clientaddress[1]
-doc.append(Command('begin', NoEscape(EscapeThem)))
+doc.append(Command('begin', 'letter' , extra_arguments=NoEscape(EscapeThem)))
 
 doc.append(Command(command='opening', arguments='Invoice ' + invoiceNum))
 doc.append(Command(command='begin', arguments=['invoice', 'USD', '0']))
@@ -52,7 +52,7 @@ doc.append(Command(command='ProjectTitle', arguments=args.title))
 for i in range(len(args.line)):
 	split1 = args.line[i]
 	newsplit = split1.split(';')
-	doc.append(Command(command='fee', arguments=[newsplit[0], newsplit[1], \
+	doc.append(Command(command='Fee', arguments=[newsplit[0], newsplit[1], \
 		newsplit[2]]))
 
 #Closing Arguments (heh)
@@ -60,5 +60,4 @@ doc.append(Command(command='end', arguments='invoice'))
 doc.append(Command(command='closing', arguments=args.notes))
 doc.append(Command(command='end', arguments='letter'))
 
-doc.generate_tex()
-
+doc.generate_pdf()
